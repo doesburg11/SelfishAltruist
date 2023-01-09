@@ -22,7 +22,7 @@ def selfish_altruist_portrayal(agent):
         portrayal["Color"] = ["#FF0000"]  # ["#FF0000", "#FF9999"]
         portrayal["stroke_color"] = "#00FF00"
 
-        if agent.model.verbose_7:
+        if agent.model.verbose_1:
             portrayal["text"] = str(round(agent.fitness, 1))
             portrayal["text_color"] = "white"
 
@@ -46,7 +46,7 @@ def selfish_altruist_portrayal(agent):
         portrayal["h"] = 1
         portrayal["Filled"] = "true"
         portrayal["Color"] = ["#0000FF"]
-        if agent.model.verbose_7:
+        if agent.model.verbose_1:
             portrayal["text"] = str(round(agent.fitness, 1))
             portrayal["text_color"] = "white"
 
@@ -69,7 +69,7 @@ def selfish_altruist_portrayal(agent):
         portrayal["Filled"] = "true"
         portrayal["w"] = 1
         portrayal["h"] = 1
-        if agent.model.verbose_7:
+        if agent.model.verbose_1:
             portrayal["text"] = str(round(agent.fitness, 1))
             portrayal["text_color"] = "white"
 

@@ -25,14 +25,7 @@ class SelfishAltruist(mesa.Model):
     disease = 0.0
     harshness = 0.0
 
-    verbose_0 = False  # agent count
-    verbose_1 = False  # agent_id activation move and eat
-    verbose_2 = False  # agent death
-    verbose_3 = False  # agent birth
-    verbose_4 = False  # agent life span table
-    verbose_5 = False  # agent average life span
-    verbose_6 = False  # table agent count and cumulative energy per type
-    verbose_7 = False  # Fitness values and tooltips in grid
+    verbose_1 = False  # Fitness values in grid and advanced tooltips
 
     description = (
         "A model for simulating Selfish-Altruist behavior."
@@ -87,23 +80,23 @@ class SelfishAltruist(mesa.Model):
 
         # initialize patches
         for _, x, y in self.grid.coord_iter():
-            patch = Patch(self.next_id(), (x, y), self)
-            self.grid.place_agent(patch, (x, y))
-            self.schedule.add(patch)
+            selfish_altruist_agent = Patch(self.next_id(), (x, y), self)
+            self.grid.place_agent(selfish_altruist_agent, (x, y))
+            self.schedule.add(selfish_altruist_agent)
             ptype = random.uniform(0, 1)
             if ptype < self.altruistic_probability:
-                patch.benefit_out = 0
-                patch.name = "altruist"
-                patch.pcolor = "blue"
+                selfish_altruist_agent.benefit_out = 0
+                selfish_altruist_agent.name = "altruist"
+                selfish_altruist_agent.pcolor = "blue"
             elif ptype < self.altruistic_probability + self.selfish_probability:
-                patch.benefit_out = 1
-                patch.name = "selfish"
-                patch.pcolor = "red"
+                selfish_altruist_agent.benefit_out = 1
+                selfish_altruist_agent.name = "selfish"
+                selfish_altruist_agent.pcolor = "red"
             else:
-                patch.benefit_out = 0
-                patch.name = "void"
-                patch.pcolor = "black"
-                patch.altruism_benefit = 0
+                selfish_altruist_agent.benefit_out = 0
+                selfish_altruist_agent.name = "void"
+                selfish_altruist_agent.pcolor = "black"
+                selfish_altruist_agent.altruism_benefit = 0
 
         self.running = True
         self.datacollector.collect(self)
@@ -119,9 +112,6 @@ class SelfishAltruist(mesa.Model):
         grid_iterator = self.grid.coord_iter()
         for agent, x, y in grid_iterator:
             position_agent = (x, y)
-            # print(position_agent)
-            # print(agent.name)
-            # initialize al fitness values to zero
             agent.sum_fitness_selfish_in_neighborhood = 0
             agent.sum_fitness_altruists_in_neighborhood = 0
             agent.sum_fitness_harshness_in_neighborhood = 0
@@ -146,8 +136,7 @@ class SelfishAltruist(mesa.Model):
                                                                agent.sum_total_fitness_in_neighborhood
                 agent.weight_fitness_altruists_in_neighborhood = agent.sum_fitness_altruists_in_neighborhood / \
                                                                  agent.sum_total_fitness_in_neighborhood
-                agent.weight_fitness_harshness_in_neighborhood = (
-                                                                             agent.sum_fitness_harshness_in_neighborhood + self.disease) / \
+                agent.weight_fitness_harshness_in_neighborhood = (agent.sum_fitness_harshness_in_neighborhood + self.disease) / \
                                                                  agent.sum_total_fitness_in_neighborhood
             else:
                 agent.weight_fitness_selfish_in_neighborhood = 0
@@ -163,8 +152,6 @@ class SelfishAltruist(mesa.Model):
                     "P[harshness]": agent.weight_fitness_harshness_in_neighborhood,
                 }
             )
-        # print("round 2: calculate probabilities for next step")
-        # print(self.datacollector.get_table_dataframe("Lottery"))
         grid_iterator = self.grid.coord_iter()
         for agent, x, y in grid_iterator:
             breed_chance = random.uniform(0, 1)
