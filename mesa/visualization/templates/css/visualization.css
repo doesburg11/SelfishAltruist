@@ -1,0 +1,26 @@
+:root {
+   --bs-dark-rgb: 12,60,96;
+   --bs-primary-rgb: 255,0,0;
+}
+slider-selection.tick-slider-selection {
+    background-color: red;
+    background-image: red;
+    color: red;
+}
+/* This is specific to the Network visualization */
+
+div.d3tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 1px;
+    font: 20px sans-serif;
+    background: lightsteelblue;
+    border: 3px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+canvas.world-grid {
+    position:absolute;
+    border:1px dotted
+}
