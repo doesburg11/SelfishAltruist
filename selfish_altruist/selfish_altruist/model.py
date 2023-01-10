@@ -1,7 +1,7 @@
 """
 Selfish-Altruist Model
 
-Adjustment of:
+Reproduction of:
  Wilensky, U. (1997). NetLogo Selfish-Altruist model
 """
 
