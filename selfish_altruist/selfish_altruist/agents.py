@@ -2,7 +2,7 @@ import mesa
 from mesa.space import SingleGrid
 
 
-class Patch(mesa.Agent):
+class SelfishAltruistAgent(mesa.Agent):
 
     def __init__(self, unique_id, pos, model):
         """

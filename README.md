@@ -10,7 +10,7 @@ This model (and Cooperation and Divide the Cake) are part of the EACH unit ("Evo
 
 ## HOW IT WORKS
 
-1. Patches live in five-cell, plus-sign-shaped neighborhoods.  Whenever a patch is calculating something about its fitness, it is the center of the neighborhood.  For another patch, when that patch is calculating, it becomes merely one of the neighbors.
+1. SelfishAltruistAgentes live in five-cell, plus-sign-shaped neighborhoods.  Whenever a patch is calculating something about its fitness, it is the center of the neighborhood.  For another patch, when that patch is calculating, it becomes merely one of the neighbors.
 
 2. Each patch is an agent that has a fitness.  Each patch is also the location of a lottery for its space.  The patch and the four surrounding patches put in "seeds" to try to get the patch turned to their type of patch, altruist or selfish. Being successful in the lottery is getting patches to turn to your type.  We're assuming here that the type (altruistic or selfish) is the important genetic trait.
 

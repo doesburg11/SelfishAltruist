@@ -2,7 +2,7 @@
 
 ## Summary
 
-A simple ecological model, consisting of three agent types: Predators, Prey, and GrasPatches. The Predators and Prey wander around the grid at random. Predators and Prey both expend energy moving around, and replenish it by eating. Prey eat GrassPatches, and Predators eat Prey if they end up on the same grid cell.
+A simple ecological model, consisting of three agent types: Predators, Prey, and GrasSelfishAltruistAgentes. The Predators and Prey wander around the grid at random. Predators and Prey both expend energy moving around, and replenish it by eating. Prey eat GrassSelfishAltruistAgentes, and Predators eat Prey if they end up on the same grid cell.
 
 If wolves and sheep have enough energy, they reproduce, creating a new wolf or sheep (in this simplified model, only one parent is needed for reproduction). The grass on each cell regrows at a constant rate. If any wolves and sheep run out of energy, they die.
 

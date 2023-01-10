@@ -10,7 +10,7 @@ import random
 
 from selfish_altruist.scheduler import BaseSchedulerByFilteredType
 
-from selfish_altruist.agents import Patch
+from selfish_altruist.agents import SelfishAltruistAgent
 
 
 class SelfishAltruist(mesa.Model):
@@ -68,9 +68,10 @@ class SelfishAltruist(mesa.Model):
         self.grid = mesa.space.SingleGrid(self.n_grid_cells_width, self.n_grid_cells_height, torus=True)
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Selfish": lambda m: m.schedule.get_type_count(Patch, lambda g: g.name == "selfish"),
-                "Altruist": lambda m: m.schedule.get_type_count(Patch, lambda g: g.name == "altruist"),
-                "Void": lambda m: m.schedule.get_type_count(Patch, lambda g: g.name == "void"),
+                "Selfish": lambda m: m.schedule.get_type_count(SelfishAltruistAgent, lambda g: g.name == "selfish"),
+                "Altruist": lambda m: m.schedule.get_type_count(SelfishAltruistAgent, lambda g: g.name == "altruist"),
+                "Void": lambda m: m.schedule.get_type_count(SelfishAltruistAgent, lambda g: g.name == "void"),
+                "Population": lambda m: m.schedule.get_type_count(SelfishAltruistAgent, lambda g: g.name == "selfish" or g.name == "altruist")
             },
             tables={
                 "Fitness": ["position", "agent", "fitness"],
@@ -80,7 +81,7 @@ class SelfishAltruist(mesa.Model):
 
         # initialize patches
         for _, x, y in self.grid.coord_iter():
-            selfish_altruist_agent = Patch(self.next_id(), (x, y), self)
+            selfish_altruist_agent = SelfishAltruistAgent(self.next_id(), (x, y), self)
             self.grid.place_agent(selfish_altruist_agent, (x, y))
             self.schedule.add(selfish_altruist_agent)
             ptype = random.uniform(0, 1)
@@ -106,8 +107,9 @@ class SelfishAltruist(mesa.Model):
         self.schedule.step()  # Base schedule to find out fitness per cell/agent
         # collect fitness per cell/agent in Table
         self.datacollector.collect(self)
-        # print("round 1: calculate fitness per cell:")
-        # print(self.datacollector.get_table_dataframe("Fitness"))
+        #print("round 1: calculate fitness per cell:")
+        print(self.datacollector.get_model_vars_dataframe())
+
 
         grid_iterator = self.grid.coord_iter()
         for agent, x, y in grid_iterator:
