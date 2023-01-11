@@ -106,6 +106,13 @@ chart_element = mesa.visualization.ChartModule(
     ]
 )
 
+chart_element1 = mesa.visualization.ChartModule(
+    [
+        {"Label": "%Altruist", "Color": "#9999FF"},
+    ]
+)
+
+
 model_params = {
     "title": mesa.visualization.StaticText(
         "Parameters:"
@@ -126,7 +133,7 @@ model_params = {
         "disease", 0.2, 0.0, 1.0, 0.01
     ),
     "harshness": mesa.visualization.Slider(
-        "harshness", 0.96, 0.0, 1.0, 0.01
+        "harshness", 0.96, 0.0, 1.5, 0.01
     ),
 
 }
@@ -134,7 +141,7 @@ model_params = {
 server = mesa.visualization.ModularServer(
     SelfishAltruist,
 
-    [canvas_element, static_string, chart_element],
+    [canvas_element, static_string, chart_element1, chart_element],
     "Selfish-Altruist Model",
     model_params
 )

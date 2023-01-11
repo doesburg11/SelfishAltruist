@@ -7,10 +7,113 @@ Reproduction of:
 
 import mesa
 import random
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from typing import Type, Callable
+from collections import defaultdict
 
-from selfish_altruist.scheduler import BaseSchedulerByFilteredType
 
-from selfish_altruist.agents import SelfishAltruistAgent
+class BaseSchedulerByFilteredType(mesa.time.BaseScheduler):
+
+    def __init__(self, model: mesa.Model) -> None:
+        super().__init__(model)
+        self.agents_by_type = defaultdict(dict)
+
+    def add(self, agent: mesa.Agent) -> None:
+        """
+        Add an Agent object to the schedule
+
+        Args:
+            agent: An Agent to be added to the schedule.
+        """
+        super().add(agent)
+        agent_class: type[mesa.Agent] = type(agent)
+        self.agents_by_type[agent_class][agent.unique_id] = agent
+
+    def get_type_count(
+            self,
+            type_class: Type[mesa.Agent],
+            filter_func: Callable[[mesa.Agent], bool] = None,
+    ) -> int:
+        """
+        Returns the current number of agents of certain type in the queue that satisfy the filter function.
+        """
+        count = 0
+        for agent in self.agents_by_type[type_class].values():
+            if filter_func == None or filter_func(agent):
+                count += 1
+        return count
+
+
+class SelfishAltruistAgent(mesa.Agent):
+
+    def __init__(self, unique_id, pos, model):
+        """
+        Creates a new patch of grass
+
+        Args:
+            fully_grown: (boolean) Whether the patch of grass is fully grown or not
+        """
+        super().__init__(unique_id, model)
+        self.name = str()
+        self.pcolor = str()
+        self.pos = pos
+        self.fitness: float = 0
+
+        self.n_neighboring_altruists = 0  # N_A in paper
+        self.sum_fitness_selfish_in_neighborhood = 0
+        self.sum_fitness_altruists_in_neighborhood = 0
+        self.sum_fitness_harshness_in_neighborhood = 0
+        self.sum_total_fitness_in_neighborhood = 0
+        self.weight_fitness_selfish_in_neighborhood = 0
+        self.weight_fitness_altruists_in_neighborhood = 0
+        self.weight_fitness_harshness_in_neighborhood = 0
+
+    def n_neighboring_agents(self):
+        # print("position " + str(self.pos))
+        n_neighbor_selfish = 0
+        n_neighbor_altruists = 0
+        n_neighbor_voids = 0
+        neighbor_iterator = self.model.grid.iter_neighbors(self.pos, moore=False, include_center=True, radius=1)
+        for neighbor in neighbor_iterator:
+            # print(str(neighbor.pos) + ":  " + str(neighbor.name))
+            if neighbor.name == "selfish":
+                n_neighbor_selfish += 1
+            elif neighbor.name == "altruist":
+                n_neighbor_altruists += 1
+            if neighbor.name == "void":
+                n_neighbor_voids += 1
+        n_neigborhood_cells = n_neighbor_selfish + n_neighbor_altruists + n_neighbor_voids
+        # print("n_neigborhood_cells")
+        # print(n_neigborhood_cells)
+
+        return n_neighbor_selfish, n_neighbor_altruists, n_neighbor_voids, n_neigborhood_cells
+
+    def calculate_fitness(self):
+        self.n_neighboring_altruists = self.n_neighboring_agents()[1]  # N_A in paper
+        n_neighbor_cells = self.n_neighboring_agents()[3]
+        c = self.model.cost_of_altruism
+        b = self.model.benefit_of_altruism
+        fitness_void = self.model.harshness
+
+        if self.name == "altruist":
+            return 1 - c + b * self.n_neighboring_altruists / n_neighbor_cells
+        elif self.name == "selfish":
+            return 1 + b * (self.n_neighboring_altruists / n_neighbor_cells)
+        elif self.name == "void":
+            return fitness_void
+
+    def step(self):
+        n_selfish, n_altruists, n_voids, n_cells = self.n_neighboring_agents()
+        self.fitness = self.calculate_fitness()
+        self.model.datacollector.add_table_row(
+            "Fitness", {
+                "position": self.pos,
+                "agent": self.name,
+                "fitness": self.calculate_fitness(),
+            }
+        )
 
 
 class SelfishAltruist(mesa.Model):
@@ -226,3 +329,39 @@ class SelfishAltruist(mesa.Model):
             # https://stackoverflow.com/questions/34166030/obtaining-last-value-of-dataframe-column-without-index
 
             self.running = False
+
+if __name__ == "__main__":
+    harshness_range = 0.97  # np.arange(0.92, 1.02, 0.01)
+    disease_range = np.arange(0.18, 0.22, 0.01)
+
+    params = {"cost_of_altruism": 0.13, "benefit_of_altruism": 0.48, "disease": disease_range, "harshness": harshness_range}
+
+    results = mesa.batch_run(
+        SelfishAltruist,
+        parameters=params,
+        iterations=5,
+        max_steps=200,
+        number_processes=None,
+        data_collection_period=-1,
+        display_progress=True,
+    )
+
+    df = pd.DataFrame(results)
+    print(df.to_string())
+
+    i = 0
+    d_array = [0 for i in range(len(disease_range))]
+    # h_array = [0 for i in range(len(harshness_range))]
+    percentage_altruist_array = [0 for i in range(len(disease_range))]
+    for d in disease_range:
+        d_array[i] = d
+        dfh = df.query("disease==@d")
+        percentage_altruist_array[i] = dfh["%Altruist"].mean()
+        i += 1
+        # print("harshess: "+str(h)+" "+str(dfh["%Altruist"].mean()))
+
+    print(d_array)
+    print(percentage_altruist_array)
+    print("% altruist of total cells after 200 steps")
+    plt.plot(d_array, percentage_altruist_array)
+    plt.show()
