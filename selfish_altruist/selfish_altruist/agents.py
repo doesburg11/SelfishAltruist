@@ -26,14 +26,14 @@ class SelfishAltruistAgent(mesa.Agent):
         self.weight_fitness_altruists_in_neighborhood = 0
         self.weight_fitness_harshness_in_neighborhood = 0
 
-    def n_neighboring_agents(self):
-        # print("position " + str(self.pos))
+    def n_neighboring_agents_per_type(self):
+        #print("position " + str(self.pos))
         n_neighbor_selfish = 0
         n_neighbor_altruists = 0
         n_neighbor_voids = 0
         neighbor_iterator = self.model.grid.iter_neighbors(self.pos, moore=False, include_center=True, radius=1)
         for neighbor in neighbor_iterator:
-            # print(str(neighbor.pos) + ":  " + str(neighbor.name))
+            #print(str(neighbor.pos) + ":  " + str(neighbor.name))
             if neighbor.name == "selfish":
                 n_neighbor_selfish += 1
             elif neighbor.name == "altruist":
@@ -47,8 +47,8 @@ class SelfishAltruistAgent(mesa.Agent):
         return n_neighbor_selfish, n_neighbor_altruists, n_neighbor_voids, n_neigborhood_cells
 
     def calculate_fitness(self):
-        self.n_neighboring_altruists = self.n_neighboring_agents()[1]  # N_A in paper
-        n_neighbor_cells = self.n_neighboring_agents()[3]
+        self.n_neighboring_altruists = self.n_neighboring_agents_per_type()[1]  # N_A in paper
+        n_neighbor_cells = self.n_neighboring_agents_per_type()[3]
         c = self.model.cost_of_altruism
         b = self.model.benefit_of_altruism
         fitness_void = self.model.harshness
@@ -61,7 +61,7 @@ class SelfishAltruistAgent(mesa.Agent):
             return fitness_void
 
     def step(self):
-        n_selfish, n_altruists, n_voids, n_cells = self.n_neighboring_agents()
+        n_selfish, n_altruists, n_voids, n_cells = self.n_neighboring_agents_per_type()
         self.fitness = self.calculate_fitness()
         self.model.datacollector.add_table_row(
             "Fitness", {
@@ -71,9 +71,8 @@ class SelfishAltruistAgent(mesa.Agent):
             }
         )
 
-    # print("position " + str(self.pos) + " fitness " + str(self.name) + " = " + str(self.fitness()) + " N_A = " + str(
-    #    n_altruists))
-    # print("n_altruists")
-    # print(n_altruists)
-    # print("n_altruists/5")
-    # print(float(n_altruists / n_cells))
+        print("position " + str(self.pos) + " fitness " + str(self.name) + " = " + str(self.fitness) + " N_A = " + str(n_altruists))
+        # print("n_altruists")
+        # print(n_altruists)
+        # print("n_altruists/5")
+        # print(float(n_altruists / n_cells))

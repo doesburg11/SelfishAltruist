@@ -14,8 +14,8 @@ from selfish_altruist.agents import SelfishAltruistAgent
 
 
 class SelfishAltruist(mesa.Model):
-    n_grid_cells_height = 40
-    n_grid_cells_width = 40
+    n_grid_cells_height = 5
+    n_grid_cells_width = 5
     canvas_width = 400
     canvas_height = canvas_width * (n_grid_cells_height / n_grid_cells_width)
     altruistic_probability = 0.26
@@ -25,7 +25,7 @@ class SelfishAltruist(mesa.Model):
     disease = 0.0
     harshness = 0.0
 
-    verbose_1 = False  # Fitness values in grid and advanced tooltips
+    verbose_1 = True  # Fitness values in grid and advanced tooltips
 
     description = (
         "A model for simulating Selfish-Altruist behavior."
