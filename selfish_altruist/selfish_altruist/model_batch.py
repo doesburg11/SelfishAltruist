@@ -9,7 +9,7 @@ import mesa
 import random
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 from typing import Type, Callable
 from collections import defaultdict
 
@@ -330,16 +330,18 @@ class SelfishAltruist(mesa.Model):
 
             self.running = False
 
+
 if __name__ == "__main__":
     harshness_range = 0.97  # np.arange(0.92, 1.02, 0.01)
-    disease_range = np.arange(0.18, 0.22, 0.01)
+    disease_range = np.arange(0.15, 0.25, 0.005)
 
-    params = {"cost_of_altruism": 0.13, "benefit_of_altruism": 0.48, "disease": disease_range, "harshness": harshness_range}
+    params = {"cost_of_altruism": 0.13, "benefit_of_altruism": 0.48, "disease": disease_range,
+              "harshness": harshness_range}
 
     results = mesa.batch_run(
         SelfishAltruist,
         parameters=params,
-        iterations=5,
+        iterations=100,
         max_steps=200,
         number_processes=None,
         data_collection_period=-1,
@@ -362,6 +364,8 @@ if __name__ == "__main__":
 
     print(d_array)
     print(percentage_altruist_array)
-    print("% altruist of total cells after 200 steps")
-    plt.plot(d_array, percentage_altruist_array)
-    plt.show()
+    # df = pd.DataFrame(d_array, columns =['disease'])
+    df = pd.DataFrame(list(zip(d_array, percentage_altruist_array)),
+                      columns=['disease', '%Altruist'])
+    print(df)
+    df.to_csv("test1.csv", index=True)
